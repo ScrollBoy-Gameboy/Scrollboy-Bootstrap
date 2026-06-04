@@ -24,6 +24,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bootrom-${{ matrix.rgbds }}
-          path: |
-            *.bin
+          path: bin/*.bin
           if-no-files-found: error
