@@ -1075,20 +1075,21 @@ SetupCompatibility:
 GameBoyLogoTiles:
 ; Whitespace is not stripped after line continuations until RGBDS v0.6.0, so rows are not indented
     logo_row_gfx_bytes \
-.......X, XXXXXXXX, XX......, .XXXXX.., ......XX, XXX....., ...XXXX., ....XXXX, XXXXXXXX, .......X, XXXXXXXX, XX......, ...XXXXX, XXXX..XX, XXX....., ..XXXXX., \
-....XXXX, XXXXXXXX, XXXX...., XXXXXX.., .....XXX, XXX....., ..XXXXX., ....XXXX, XXXXXXXX, .......X, XXXXXXXX, XXXX...., .XXXXXXX, XXXXXX.X, XXXX...., .XXXXX.., \
-..XXXXXX, XX......, XXXX...X, XXXXXXX., .....XXX, XXXX...., .XXXXXX., ...XXXXX, ........, .......X, XXX....X, XXXXX..X, XXXXX..., ..XXXXX., XXXXX..X, XXXXX..., \
-.XXXXXX., ........, ......XX, XXXXXXX., ....XXXX, XXXX...., XXXXXXX., ...XXXXX, ........, ......XX, XXX....., XXXXX.XX, XXX....., ...XXXX., .XXXXXXX, XXX.....
+........, .XXXXXXX, XX..XXXX, XXXXXXXX, XXXXX..., ..XXXXXX, XX.XXXXX, .......X, XXXX...., ........, .XXXXXXX, XXXXXXX., .....XXX, XXXXX.XX, XXX..XXX, X......., \
+........, XXX...XX, ...XX..., .XX...XX, X...X..., XXX..XX., .....XX., ........, .XX....., ........, ...XXXX., ...XXX.., ...XXX.., XX......, XX...XX., ........, \
+........, XXX....., X.XX...., ..X....X, X...X..X, XX....XX, X....XX., ........, .XX....., ........, ....XXXX, ...XX..., ..XXX..., .XXX...., .XX..X.., ........, \
+........, XXXX...., X.XX...., ...X...X, X..XX..X, X......X, XX...XX., ........, .XX....., ........, .....XX., ...X...., ..XX...., ..XXX..., .XXXXX.., ........
     logo_row_gfx_bytes \
-XXXXX..., ........, .....XXX, X..XXXX., ....XXXX, XXXX...X, XXXXXXX., ...XXXXX, XXXXX..., ......XX, XXXXXXXX, XXXX..XX, XX......, ...XXXXX, ..XXXXXX, X......., \
-XXXX...., ........, ....XXXX, ...XXXXX, ...XXXX., XXXXX.XX, XX.XXXX., ..XXXXXX, XXXXX..., ......XX, XXXXXXXX, XXX..XXX, XX......, ...XXXXX, ...XXXXX, ........, \
-XXXX...., .XXXXXXX, X..XXXXX, XXXXXXXX, ..XXXXX., .XXXXXXX, XX.XXXXX, ..XXXXX., ........, .....XXX, XX.....X, XXXX.XXX, XX......, ...XXXX., ..XXXXX., ........, \
-XXXXX..., .XXXXXXX, X.XXXXXX, XXXXXXXX, ..XXXX.., .XXXXXXX, X..XXXXX, ..XXXX.., ........, .....XXX, XX......, XXXX..XX, XX......, ..XXXXX., ..XXXXX., ........
-    logo_row_gfx_bytes \
-.XXXXX.., ....XXXX, .XXXXX.., ...XXXXX, .XXXXX.., ..XXXXXX, ....XXXX, .XXXXX.., ........, .....XXX, X......X, XXXX..XX, XXX....., XXXXXX.., ..XXXXX., ........, \
-...XXXXX, XXXXXXXX, XXXXX..., ....XXXX, XXXXX..., ..XXXXX., ....XXXX, XXXXXXXX, XXXXX..., ....XXXX, XXXXXXXX, XXX....X, XXXXXXXX, XXXX...., .XXXXX.., ........, \
-.....XXX, XXXXXXX., XXXX...., ....XXXX, XXXXX..., ...XXX.., ....XXXX, XXXXXXXX, XXXXX..., ....XXXX, XXXXXXXX, X......., .XXXXXXX, XX......, .XXXXX.., ........, \
-........, ........, ........, ........, ........, ........, ........, ........, ........, ........, ........, ........, ........, ........, ........, ........
+........, XXXXX..., ..XX...., .......X, X.XX...X, X......X, XX...XX., ........, .XX....., ........, .....XXX, .XXXXXX., ..XX...., ..XXX..., ..XXX..., ........, \
+........, .XXXXXXX, ..XX...., ...X..XX, XXXX...X, X......X, XX..XXX., ........, XXX....., ........, ....XXXX, ....XXXX, ..XX...., ..XXX..., ..XXX..., ........, \
+........, ...XXXXX, ..XX...., ...X..XX, X.XXX..X, X......X, X....XX., ...X...., .XX....X, ........, .....XXX, .....XXX, ..XX...., ..XX...., ..XXX..., ........, \
+........, X....XXX, X..XX..., ..XX..XX, X..XX..X, XX.....X, X....XX., ...X...., .XX....X, ........, .....XXX, .....XXX, ..XXX..., ..XX...., ..XXX..., ........
+    logo_row_gfx_bytes 
+........, X.....XX, X..XXX.., .XX....X, X..XXX.., XX....XX, ....XXX., ...XX..., XXX....X, X......., .....XX., .....XXX, ...XX..., .XX....., ..XXX..., ........, \
+........, XX.....X, X....XXX, X.X..XXX, XX.XXXXX, ..XXXX.., ..XXXXXX, XXXXXXXX, XXXXXXXX, XX......, .....XX., .....XX., .....XXX, X......., .XXXXX.., ........, \
+........, XXX...XX, X......., ........, ........, ........, ........, ........, ........, ........, ....XXXX, XXXXXX.., ........, ........, ........, ........, \
+........, XXXXXXX., ........, ........, ........, ........, ........, ........, ........, ........, ..XXXXXX, XXXXX..., ........, ........, ........, ........
+
 .end
 
 
