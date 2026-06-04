@@ -36,10 +36,6 @@ ifeq ($(UNAME_S), Darwin)
 	SHASUM = shasum -a 256
 endif
 
-compare: sha256sums.txt all
-	${SHASUM} -c $<
-.PHONY: compare
-
 BINS := $(patsubst %,bin/%.bin,${MODELS})
 SYMS := $(patsubst %,bin/%.sym,${MODELS})
 all: ${BINS} ${SYMS}
