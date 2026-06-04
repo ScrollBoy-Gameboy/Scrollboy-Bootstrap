@@ -1,12 +1,11 @@
-name: Regression testing
+name: Compile BootRom
+
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '37 13 20 * *'
 
 jobs:
-  testing:
+  building:
     strategy:
       matrix:
         rgbds: ['', '--HEAD']
@@ -20,4 +19,11 @@ jobs:
           brew install ${{ matrix.rgbds }} rgbds
       - name: Build ROMs
         run: |
-          make compare
+          make
+      - name: Upload binary artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootrom-${{ matrix.rgbds }}
+          path: |
+            *.bin
+          if-no-files-found: error
