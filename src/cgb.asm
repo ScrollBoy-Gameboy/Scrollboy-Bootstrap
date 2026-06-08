@@ -49,21 +49,6 @@ LogoBottomHalf:
 ...., ...X, XX.., .XXX, XXX., ..XX, XXXX, ..XX, ...., XX.., .XX., ....
 
 
-RTile:
-    PUSHO
-    OPT b.X
-    db %..XXXX..
-    db %.X....X.
-    db %X.XXX..X
-    db %X.X..X.X
-    db %X.XXX..X
-    db %X.X..X.X
-    db %.X....X.
-    db %..XXXX..
-    POPO
-.end
-
-
 ; Titles matching these checksums need the Nintendo logo tilemap in VRAM when they boot up
 LogoTilemapChecksums:
     db $58, $43
@@ -102,17 +87,6 @@ Setup:
     cp LOW(HeaderTitle)
     jr nz, .processLogo
 
-    ; ld hl, vRTile
-    ld de, RTile
-    ld b, RTile.end - RTile
-.copyRTile
-    ld a, [de]
-    inc de
-    ld [hli], a
-    inc hl
-    dec b
-    jr nz, .copyRTile
-
     call SetupGameBoyLogo
 
     ld a, BANK(vGameBoyLogoAttrs)
@@ -125,31 +99,6 @@ Setup:
     call DoLogoAnimation
     xor a
     ldh [rVBK], a
-
-    ld c, LOW(hLogoBuffer)
-    ld hl, LogoTopHalf
-    ld b, (HeaderTitle - HeaderLogo) / 2
-.checkLogo
-    ldh a, [c]
-    inc c
-    cp [hl]
-.logoFailure
-    jr nz, .logoFailure
-    inc hl
-    dec b
-    jr nz, .checkLogo
-
-    ld hl, HeaderTitle
-    ld b, $19 ; Checksum starting value
-    ld a, b
-.computeChecksum
-    add a, [hl]
-    inc l
-    dec b
-    jr nz, .computeChecksum
-    add a, [hl]
-.checksumFailure
-    jr nz, .checksumFailure
 
     call PerformFadeout
 IF !(DEF(agb0) || DEF(agb))
@@ -644,17 +593,7 @@ ENDC
     ld bc, -$58 ; Go backwards 5 and a half tiles
     add hl, bc
     call DecodeLogoHalf
-    ld bc, -8 ; Go backwards half a tile
-    add hl, bc
-    ld de, RTile
-    ld c, 8
-.copyRTile
-    inc hl
-    ld a, [de]
-    ld [hli], a
-    inc de
-    dec c
-    jr nz, .copyRTile
+    ; --- RTile copy to VRAM removed ---
 
     ld hl, vGameBoyLogoAttrs
     ld b, 8
@@ -1286,8 +1225,7 @@ vBlankTile:
     ds TILE_SIZE
 vLogoTiles:
     ds  (HeaderTitle - HeaderLogo) * TILE_SIZE / 2
-vRTile:
-    ds TILE_SIZE
+; vRTile label and space removed – no longer needed
 
 SECTION "VRAM tiles 1", VRAM[_VRAM], BANK[1]
 
@@ -1298,8 +1236,7 @@ vGameBoyLogoTiles:
     ds (GameBoyLogoTiles.end - GameBoyLogoTiles) * 4
 vNintendoLogoTiles:
     ds 6 * TILE_SIZE
-vSecondRTile:
-    ds TILE_SIZE
+; vSecondRTile removed as well
 vNintendoLogoTilesEnd:
 
 ;; Definition of VRAM layout
