@@ -1,10 +1,10 @@
 # Scrollboy Bootstrap ROM
 
-This is a custom Game Boy bootstrap ROM for the Scrollboy project.
+The Custom Bootstrap ROM for the Scrollboy project.
 
 # Logos
 
-The logos are in Plain Text format and can be copied and pasted directly into any `cgb.asm` decompiled bootstrap ROM.
+The logos are in Plain Text format and can be copied and pasted directly into the `cgb.asm` decompiled bootstrap ROM from [ISSOtm/gb-bootroms](https://codeberg.org/ISSOtm/gb-bootroms).
 
 ### Gameboy Logo
 ```
@@ -39,22 +39,5 @@ LogoBottomHalf:
 ...., ..XX, .XX., .XX., .XXX, .XXX, ...., ..XX, ...., .XXX, XXX., ...., \
 ...., ..XX, XXX., .XXX, XXXX, .XXX, XXXX, ..XX, ...., XXXX, XXX., ...., \
 ...., ...X, XX.., .XXX, XXX., ..XX, XXXX, ..XX, ...., XX.., .XX., ....
-```
-
-### (R) Tile
-```
-RTile:
-    PUSHO
-    OPT b..
-    db %........
-    db %........
-    db %........
-    db %........
-    db %........
-    db %........
-    db %........
-    db %........
-    POPO
-.end
 ```
 
