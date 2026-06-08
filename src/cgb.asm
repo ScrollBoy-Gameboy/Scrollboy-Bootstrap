@@ -3,6 +3,14 @@ INCLUDE "constants.inc"
 INCLUDE "header.inc"
 
 
+MACRO idx_flgs
+    REPT _NARG / 2
+        db (\1) << 5 | (\2)
+        SHIFT 2
+    ENDR
+ENDM
+
+
 SECTION "Boot ROM 1", ROM0[$0000]
 
 EntryPoint:
