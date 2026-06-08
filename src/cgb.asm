@@ -49,12 +49,6 @@ LogoBottomHalf:
 ...., ...X, XX.., .XXX, XXX., ..XX, XXXX, ..XX, ...., XX.., .XX., ....
 
 
-; Titles matching these checksums need the Nintendo logo tilemap in VRAM when they boot up
-LogoTilemapChecksums:
-    db $58, $43
-.end
-
-
 Setup:
     ldh [rSVBK], a
     ld a, %11_11_11_00
@@ -118,7 +112,6 @@ IF DEF(agb0) || DEF(agb)
 ENDC
     ld a, $11
     ldh [rBANK], a
-    jp $0100          ; jump to cartridge entry point
 
 
 SECTION "Boot ROM 2", ROM0[$0200]
@@ -654,87 +647,10 @@ ENDC
     jr nz, .initBGPalsLoop
     call CommitBGPalettes
 
-
-    ld hl, HeaderOldLicensee
-    ld a, [hl]
-    cp $33
-    jr nz, .usingOldLicensee
-    ; New licensee field is 2 bytes, check the first one now
-    ld l, LOW(HeaderNewLicensee)
-    ld e, "0"
-    ld a, [hli]
-    cp e
-    jr nz, .useDefaultIndex
-    inc e ; ld e, "1"
-    ; ...and re-use the code below to finish the check
-    jr .checkMadeByNintendo
-.usingOldLicensee
-    ld l, LOW(HeaderOldLicensee)
-    ld e, 1
-.checkMadeByNintendo
-    ; Nintendo has licensee code 01, which is either hex 01 or ASCII "01"
-    ; for old and new licensee field, respectively.
-    ; Previous code loaded the correct byte in E
-    ld a, [hli]
-    cp e
-    jr nz, .useDefaultIndex
-
-    ld l, LOW(HeaderTitle)
-    ld bc, 0 << 8 | 16 ; Sum in B, remaining length in C
-.checksumTitle
-    ld a, [hli]
-    add a, b
-    ld b, a
-    dec c
-    jr nz, .checksumTitle
-    ld [wTitleChecksum], a
-
-    ; Try to find the checksum in the database
-    ld hl, TitleChecksums
+    ; Use default palette triplet (index 0)
     ld c, 0
-.seekTitleChecksum
-    ld a, [hli]
-    cp b
-    jr z, .foundTitleChecksum
-    inc c
-    ld a, c
-    cp TitleChecksums.end - TitleChecksums
-    jr nz, .seekTitleChecksum
-    jr .useDefaultIndex
+    jr .gotIndex
 
-.foundTitleChecksum
-    ; Some checksums need to be further disambiguated based on the 4th title byte
-    ; ("Letter" is a bit of a misnomer because it can be a space or a hyphen)
-    ld a, c
-    sub TitleChecksums.ambiguous - TitleChecksums
-    jr c, .gotIndex
-
-    ld hl, TitleFourthLetters
-    ld d, 0
-    ld e, a
-    add hl, de
-.seekFourthLetter
-    ld a, [HeaderTitle+3]
-    ld d, a
-    ld a, [hl]
-    cp d
-    jr z, .gotIndex
-    ; Advance search by one row
-    ld de, TitleFourthLetters.row - TitleFourthLetters
-    add hl, de
-    ; Similarly advance index
-    ld a, c
-    add a, e
-    ld c, a
-    ; Compare index against max one
-    sub (TitleFourthLetters.end - TitleFourthLetters) \ ; Max index
-      + (TitleChecksums.ambiguous - TitleChecksums) ; (not forgetting base index)
-    ; If there's some indexes left to check, keep going
-    jr c, .seekFourthLetter
-    ; If not, use default index
-
-.useDefaultIndex
-    ld c, 0
 .gotIndex
     ld hl, PalTripletIDsAndFlags
     ld b, 0
@@ -754,10 +670,8 @@ IF DEF(cgb0)
     ld [wPalShufflingFlagsCopy], a
 ENDC
     ld [wPalShufflingFlags], a
-    ; Nintendo: "damn, we don't have enough room in the boot ROM to clear wave RAM!"
-    ; Also Nintendo:
-    call WriteShuffledPalTriplets ; The label is literally right below,
-    ret ; these two instructions are dead code!
+    call WriteShuffledPalTriplets
+    ret
 
 ; This shuffles **all** the predefined palette index triplets (`PaletteOffsets`) depending on the
 ; shuffling bits read from the entry in `PalTripletIDsAndFlags`.
@@ -969,44 +883,6 @@ SetupCompatibility:
     ld e, PALETTE_SIZE ; Write 4 BG colors (BGP)
     call SetOBJAndBGPals
 
-    ld hl, LogoTilemapChecksums
-    ld a, [wTitleChecksum]
-    ld b, a
-    ld c, LogoTilemapChecksums.end - LogoTilemapChecksums
-.tryWriteLogoTilemap
-    ld a, [hli]
-    cp b
-    ; BUG: If it writes the logo tilemap, this loop only manages to exit thanks to dumb luck.
-    ;
-    ; As you can see, this loop exits when C reaches 0.
-    ; Since the loop itself does not `push bc`, it follows that `WriteLogoTilemap` must preserve C,
-    ; right..?
-    ; Well, if you go check, you will notice that it doesn't! In fact, it also trashes HL, which
-    ; also alters the loop's body!! (See `ld` above.) At least B is preserved, however.
-    ; Due to the way it's written, the function returns with HL = $990F and C = $0C.
-    ; This means that, after writing the logo tilemap, this loop will iterate 1 + 11 times
-    ; (with the first iteration being only partial, since it begins after the function returns)
-    ; and will thus read 11 bytes starting at $990F... but this is in the middle of tilemap!
-    ; Three factors here allow the loop misbehaving:
-    ; - This code is executed early enough in VBlank that under the worst theoretical conditions,
-    ;   the function still exits during scanline $97, leaving enough time for the loop to read
-    ;   11 bytes from VRAM safely before exiting.
-    ; - The function ends up reading from the tilemap, which was largely cleared by the GDMA at the
-    ;   end of `PerformFadeout`, so the area around the new logo tilemap is zeroes.
-    ; - Thus, the bytes that will be read by the `ld a, [hli]` above end up being $xx, $19, and
-    ;   then 9 zero bytes. Fortunately, this does not match either of the "logo tilemap checksums"
-    ;   (remember, the title checksum has been preserved in B, and it must be one of those
-    ;   checksums for the function to be executed at all), so the loop will exit.
-    ; Make this four factors if you also want to count that the corrupted loop count is small
-    ; enough that the loop always exits before the end of VBlank; if it were 0, this could have been
-    ; different.
-    ; All in all, it's highly unlikely that this behavior is intentional, especially since a lot of
-    ; functions unnecessarily push and pop registers (for example, `PerformFadeout.fadePalettes`);
-    ; it rather seems that whoever wrote this ROM did not save registers in this one place where it
-    ; did matter, but was lucky enough to get away with it unscathed.
-    call z, WriteLogoTilemap
-    dec c
-    jr nz, .tryWriteLogoTilemap
 .done
     ret
 
@@ -1032,44 +908,6 @@ GameBoyLogoTiles:
 .end
 
 
-; The position of the cartridge's title checksum in this table is used as the index
-; into `PalTripletIDsAndFlags`, except for the "ambiguous" checksums.
-TitleChecksums:
-    ; Each line is 8 entries wide
-    db $00, $88, $16, $36, $D1, $DB, $F2, $3C
-    db $8C, $92, $3D, $5C, $58, $C9, $3E, $70
-    db $1D, $59, $69, $19, $35, $A8, $14, $AA
-    db $75, $95, $99, $34, $6F, $15, $FF, $97
-    db $4B, $90, $17, $10, $39, $F7, $F6, $A2
-    db $49, $4E, $43, $68, $E0, $8B, $F0, $CE
-    db $0C, $29, $E8, $B7, $86, $9A, $52, $01
-    db $9D, $71, $9C, $BD, $5D, $6D, $67, $3F
-    db $6B
-.ambiguous
-    ; These 14 checksums are also discriminated based on the 4th title letter, see table right below
-    db $B3, $46, $28, $A5, $C6, $D3, $27, $61, $18, $66, $6A, $BF, $0D, $F4
-.end
-
-; How to read this: letters for index $41 are the leftmost ones, letters for $4E are the rightmost
-; ones, etc. The table must then be read vertically, top to bottom.
-; For example, the letters for $41 are B, U, and R, in that order.
-TitleFourthLetters:
-; $4x:   123456789ABCDE
-     db "BEFAARBEKEK R-"
-.row db "URAR INAILICE "
-     db "R"
-.end
-
-
-; For each of these, the lower 5 bits indicate which row of `PaletteOffsets` to use.
-; The upper 3 bits indicate how the palette shall be "shuffled".
-; See `WriteShuffledPalTriplets` for an explanation of how they work.
-MACRO idx_flgs
-    REPT _NARG / 2
-        db (\1) << 5 | (\2)
-        SHIFT 2
-    ENDR
-ENDM
 PalTripletIDsAndFlags:
     ; Each line is 8 entries wide
     idx_flgs %011,28, %000, 8, %000,18, %101, 3, %101, 2, %000, 7, %100, 7, %010,11
@@ -1263,11 +1101,6 @@ vAttrMap:
 SECTION "Work RAM", WRAMX[_RAMBANK], BANK[2]
 wWorkRAM:
 
-wTitleChecksum:
-    ds 1
-
-    ds 1
-
 wPreventTerminationCounter:
     ds 1
 
@@ -1328,5 +1161,4 @@ SECTION "HRAM", HRAM[_HRAM]
 
 hLogoBuffer: ; Relied on being at $FF80
     ds $7E
-
 hStackBottom:
