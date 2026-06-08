@@ -24,20 +24,3 @@ The logos are in Plain Text format and can be copied and pasted directly into th
 ........, XXX...XX, X......., ........, ........, ........, ........, ........, ........, ........, ....XXXX, XXXXXX.., ........, ........, ........, ........, \
 ........, XXXXXXX., ........, ........, ........, ........, ........, ........, ........, ........, ..XXXXXX, XXXXX..., ........, ........, ........, ........
 ```
-
-### Nintendo Logo
-```
-LogoTopHalf:
-    logo_row_gfx_nybbles \
-...., XX.., ...X, X..., ...., ...., ...., ...., ...., ...., ...., ...., \
-...., XXX., ..XX, X..., ...., ...., ...., ...., ...., ...., ...., ...., \
-...., .XX., ..XX, ..XX, XXXX, .XX., ...X, XXXX, XX.., XXXX, XX.., ...., \
-...., .XX., ..XX, .XXX, XXXX, .XX., ...., XXXX, XXX., .XXX, XXX., ....
-LogoBottomHalf:
-    logo_row_gfx_nybbles \
-...., .XXX, .XXX, ...., ...., ...., ...., ...., ...., ...., .XX., ...., \
-...., ..XX, .XX., .XX., .XXX, .XXX, ...., ..XX, ...., .XXX, XXX., ...., \
-...., ..XX, XXX., .XXX, XXXX, .XXX, XXXX, ..XX, ...., XXXX, XXX., ...., \
-...., ...X, XX.., .XXX, XXX., ..XX, XXXX, ..XX, ...., XX.., .XX., ....
-```
-
