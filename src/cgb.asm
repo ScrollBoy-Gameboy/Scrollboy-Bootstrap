@@ -118,6 +118,7 @@ IF DEF(agb0) || DEF(agb)
 ENDC
     ld a, $11
     ldh [rBANK], a
+    jp $0100          ; jump to cartridge entry point
 
 
 SECTION "Boot ROM 2", ROM0[$0200]
@@ -593,7 +594,6 @@ ENDC
     ld bc, -$58 ; Go backwards 5 and a half tiles
     add hl, bc
     call DecodeLogoHalf
-    ; --- RTile copy to VRAM removed ---
 
     ld hl, vGameBoyLogoAttrs
     ld b, 8
@@ -1235,7 +1235,6 @@ vGameBoyLogoTiles:
     ds (GameBoyLogoTiles.end - GameBoyLogoTiles) * 4
 vNintendoLogoTiles:
     ds 6 * TILE_SIZE
-; vSecondRTile removed as well
 vNintendoLogoTilesEnd:
 
 ;; Definition of VRAM layout
