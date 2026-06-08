@@ -539,7 +539,7 @@ DecompressSecondNibble:
     ret
 
 WriteLogoTilemap:
-    ld a, LOW(vRTile / TILE_SIZE)
+    ld a, LOW(vBlankTile / TILE_SIZE)
     ld [vBigNintendoLogoMap + OLD_LOGO_WIDTH], a
 
     ld hl, vBigNintendoLogoMap + SCRN_VX_B + OLD_LOGO_WIDTH - 1
@@ -547,7 +547,7 @@ WriteLogoTilemap:
     ld c, OLD_LOGO_WIDTH
 .writeByte
     dec a
-    jr z, .done ; ynawt `ret z`?
+    jr z, .done
     ld [hld], a
     dec c
     jr nz, .writeByte
@@ -1225,7 +1225,6 @@ vBlankTile:
     ds TILE_SIZE
 vLogoTiles:
     ds  (HeaderTitle - HeaderLogo) * TILE_SIZE / 2
-; vRTile label and space removed – no longer needed
 
 SECTION "VRAM tiles 1", VRAM[_VRAM], BANK[1]
 
