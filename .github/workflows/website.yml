@@ -37,10 +37,7 @@ jobs:
 
           git clone https://x-access-token:${PAT}@github.com/${TARGET_REPO}.git pages-repo
           cd pages-repo
-          
-          if [ -d ../latest ]; then
-            find ../latest -type f -name '*.bin' -exec cp {} bios\ +
-          fi
+          cp ../latest/*.bin bios/
 
           git add -A
           git commit -m "Update Bootstrap ROM to $VERSION" || echo "No Update Available"
