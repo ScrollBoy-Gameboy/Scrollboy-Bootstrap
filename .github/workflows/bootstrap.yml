@@ -21,7 +21,7 @@ jobs:
       SCROLLBOY_EMAIL: ${{ secrets.SCROLLBOY_EMAIL }}
     
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
