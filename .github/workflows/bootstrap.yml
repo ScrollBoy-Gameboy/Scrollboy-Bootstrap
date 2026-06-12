@@ -45,26 +45,20 @@ jobs:
 
           git fetch origin
 
-          # Check if branch exists
           if git ls-remote --heads origin $BRANCH | grep $BRANCH >/dev/null; then
-            # Branch exists → checkout normally
             git checkout $BRANCH
           else
-            # Branch does NOT exist → create orphan branch
             git checkout --orphan $BRANCH
           fi
 
-          # Clear working tree (required for orphan branches)
           git rm -rf . || true
+          git clean -fdx
 
-          # Recreate folder structure
           mkdir -p "$VERSION"
           cp gbc_bios.bin "$VERSION/"
-
           mkdir -p latest
           cp gbc_bios.bin latest/
 
           git add .
           git commit -m "Upload Bootstrap $VERSION" || echo "NOTHING TO COMMIT"
-
           git push origin $BRANCH --force
