@@ -1,4 +1,4 @@
-name: Compile and Upload ScrollBoy Bootstrap ROM
+name: ScrollBoy Bootstrap ROM
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  bootstrap:
     strategy:
       matrix:
         rgbds: ['']
@@ -16,6 +16,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+      
+      - name: Generate Version ID
+        id: version
+        run: |
+          YEAR=$(date +%Y)
+          HASH=$(git rev-parse --short HEAD)
+          VERSION="v${YEAR}-${HASH}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Install RGBDS
         run: |
@@ -24,18 +32,6 @@ jobs:
       - name: Build Bootstrap ROM
         run: |
           make
-          
-  upload:
-    needs: build
-    runs-on: macos-latest
-    steps:
-      - name: Generate Version ID
-        id: version
-        run: |
-          YEAR=$(date +%Y)
-          HASH=$(git rev-parse --short HEAD)
-          VERSION="v${YEAR}-${HASH}"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Upload Bootstrap ROM
         run: |
