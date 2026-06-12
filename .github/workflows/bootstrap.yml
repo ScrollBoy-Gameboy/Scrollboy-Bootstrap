@@ -1,5 +1,8 @@
 name: ScrollBoy Bootstrap ROM
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
