@@ -8,7 +8,7 @@ jobs:
   building:
     strategy:
       matrix:
-        rgbds: ['', '--HEAD']
+        rgbds: ['']
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +23,5 @@ jobs:
       - name: Upload binary artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: bootrom-${{ matrix.rgbds }}
-          path: bin/*.bin
-          if-no-files-found: error
+          path: gbc_bios.bin
+          archive: false
