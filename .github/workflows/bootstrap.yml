@@ -14,6 +14,7 @@ jobs:
       matrix:
         rgbds: ['']
     runs-on: macos-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,7 +22,6 @@ jobs:
           submodules: recursive
       
       - name: Generate Version ID
-        id: version
         run: |
           YEAR=$(date +%Y)
           HASH=$(git rev-parse --short HEAD)
@@ -39,26 +39,32 @@ jobs:
       - name: Upload Bootstrap ROM
         run: |
           BRANCH="prebuilts"
-          VERSION="${{ env.VERSION }}"
 
           git config user.name "ScrollBoy Bot"
           git config user.email "noreply.scrollboy@voltaccept.com"
+
           git fetch origin
 
+          # Check if branch exists
           if git ls-remote --heads origin $BRANCH | grep $BRANCH >/dev/null; then
+            # Branch exists → checkout normally
             git checkout $BRANCH
           else
-            git checkout -b $BRANCH
+            # Branch does NOT exist → create orphan branch
+            git checkout --orphan $BRANCH
           fi
 
+          # Clear working tree (required for orphan branches)
+          git rm -rf . || true
+
+          # Recreate folder structure
           mkdir -p "$VERSION"
           cp gbc_bios.bin "$VERSION/"
 
-          rm -rf latest
           mkdir -p latest
           cp gbc_bios.bin latest/
 
-          git add "$VERSION" latest
+          git add .
           git commit -m "Upload Bootstrap $VERSION" || echo "NOTHING TO COMMIT"
 
-          git push origin $BRANCH
+          git push origin $BRANCH --force
