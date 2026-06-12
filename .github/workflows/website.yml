@@ -39,7 +39,7 @@ jobs:
           cd pages-repo
           
           if [ -d ../latest ]; then
-            find ../latest -type f -name '*.bin' -exec cp {} . \;
+            find ../latest -type f -name '*.bin' -exec cp {} roms\ \;
           fi
 
           git add -A
