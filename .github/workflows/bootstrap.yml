@@ -2,7 +2,6 @@ name: ScrollBoy Bootstrap ROM
 
 permissions:
   contents: write
-  # releases: write  # Only needed if using a release action that requires explicit permission; 'contents: write' is often sufficient.
 
 on:
   push:
@@ -11,6 +10,10 @@ on:
 
 jobs:
   bootstrap:
+    strategy:
+      matrix:
+        rgbds: ['']
+
     runs-on: macos-latest
 
     env:
@@ -33,23 +36,30 @@ jobs:
 
       - name: Install RGBDS
         run: |
-          brew install rgbds
+          brew install ${{ matrix.rgbds }} rgbds
 
       - name: Build Bootstrap ROM
         run: |
           make
 
-      - name: Create and Push Tag
+      - name: Upload Bootstrap ROM
         run: |
+          VERSION="${{ env.VERSION }}"
+
           git config user.name "${{ env.SCROLLBOY_USER }}"
           git config user.email "${{ env.SCROLLBOY_EMAIL }}"
-          git tag "${{ env.VERSION }}"
-          git push origin "${{ env.VERSION }}"
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.VERSION }}
-          name: ScrollBoy Bootstrap ROM ${{ env.VERSION }}
-          files: gbc_bios.bin
-          generate_release_notes: true
+          git fetch origin
+          git checkout prebuilt
+
+          mkdir -p "$VERSION"
+          cp gbc_bios.bin "$VERSION/"
+
+          rm -rf latest
+          mkdir -p latest
+          cp gbc_bios.bin latest/
+
+          git add "$VERSION" latest
+          git commit -m "Upload Bootstrap $VERSION" || echo "NOTHING TO COMMIT"
+
+          git push origin prebuilt
