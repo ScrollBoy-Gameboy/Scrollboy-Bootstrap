@@ -48,6 +48,12 @@ LogoBottomHalf:
 ...., ..XX, XXX., .XXX, XXXX, .XXX, XXXX, ..XX, ...., XXXX, XXX., ...., \
 ...., ...X, XX.., .XXX, XXX., ..XX, XXXX, ..XX, ...., XX.., .XX., ....
 
+; End label for the built-in logo data
+BuiltInLogoEnd:
+
+; Compute the total size of the built-in logo (top + bottom halves)
+BUILTIN_LOGO_SIZE EQU BuiltInLogoEnd - LogoTopHalf
+
 RTile:
     PUSHO
     OPT b.X
@@ -86,10 +92,14 @@ Setup:
     dec c
     jr nz, .clearOAM
 
-    ld de, HeaderLogo
+; ========== MODIFIED: Use built-in logo instead of cartridge header ==========
+    ; Original: ld de, HeaderLogo
+    ld de, LogoTopHalf
     ld hl, vLogoTiles
     ASSERT HIGH(vLogoTiles) == LOW(hLogoBuffer)
     ld c, h ; ld c, LOW(hLogoBuffer)
+    ; Process all bytes of the built-in logo
+    ld b, BUILTIN_LOGO_SIZE
 .processLogo
     ld a, [de]
     ldh [c], a
@@ -97,9 +107,9 @@ Setup:
     call DecompressFirstNibble
     call DecompressSecondNibble
     inc de
-    ld a, e
-    cp LOW(HeaderTitle)
+    dec b
     jr nz, .processLogo
+; ========== END MODIFIED ==========
 
     ; ld hl, vRTile
     ld de, RTile
@@ -629,12 +639,14 @@ IF DEF(cgb0)
     jr nz, .copyLogoTile
 ENDC
 
+; ========== MODIFIED: Use built-in logo for the second decompression ==========
 ; cgbE and later revisions of the GBA fixed the logo TOCTTOU
 IF !DEF(cgbE) && !DEF(agb)
-    ld de, HeaderLogo
+    ld de, LogoTopHalf   ; was HeaderLogo
 ELSE
     ld de, hLogoBuffer
 ENDC
+; ========== END MODIFIED ==========
     call DecodeLogoHalf
     ld bc, -$58 ; Go backwards 5 and a half tiles
     add hl, bc
