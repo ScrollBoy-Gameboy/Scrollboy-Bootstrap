@@ -37,16 +37,17 @@ OverrideColors:
 ; Whitespace is not stripped after line continuations until RGBDS v0.6.0, so rows are not indented
 LogoTopHalf:
     logo_row_gfx_nybbles \
-...., XX.., ...X, X..., ...., ...., ...., ...., ...., ...., ...., ...., \
-...., XXX., ..XX, X..., ...., ...., ...., ...., ...., ...., ...., ...., \
-...., .XX., ..XX, ..XX, XXXX, .XX., ...X, XXXX, XX.., XXXX, XX.., ...., \
-...., .XX., ..XX, .XXX, XXXX, .XX., ...., XXXX, XXX., .XXX, XXX., ....
+XX.., .XX., XX.., ...., ...., ...., ...., ...., ...., ...X, X..., ...., \
+XXX., .XX., XX.., ...., ..XX, ...., ...., ...., ...., ...X, X..., ...., \
+XXX., .XX., ...., ...., .XXX, X..., ...., ...., ...., ...X, X..., ...., \
+XX.X, .XX., XX.X, X.XX, ..XX, ..XX, XX.., XX.X, X..., XXXX, X..X, XXX.
 LogoBottomHalf:
     logo_row_gfx_nybbles \
-...., .XXX, .XXX, ...., ...., ...., ...., ...., ...., ...., .XX., ...., \
-...., ..XX, .XX., .XX., .XXX, .XXX, ...., ..XX, ...., .XXX, XXX., ...., \
-...., ..XX, XXX., .XXX, XXXX, .XXX, XXXX, ..XX, ...., XXXX, XXX., ...., \
-...., ...X, XX.., .XXX, XXX., ..XX, XXXX, ..XX, ...., XX.., .XX., ....
+XX.X, .XX., XX.X, XX.X, X.XX, .XX., .XX., XXX., XX.X, X..X, X.XX, ..XX, \
+XX.., XXX., XX.X, X..X, X.XX, .XXX, XXX., XX.., XX.X, X..X, X.XX, ..XX, \
+XX.., XXX., XX.X, X..X, X.XX, .XX., ...., XX.., XX.X, X..X, X.XX, ..XX, \
+XX.., .XX., XX.X, X..X, X.XX, ..XX, XXX., XX.., XX.., XXXX, X..X, XXX.
+
 
 RTile:
     PUSHO
@@ -86,14 +87,10 @@ Setup:
     dec c
     jr nz, .clearOAM
 
-; ========== MODIFIED: Use built-in logo instead of cartridge header ==========
-    ; Original: ld de, HeaderLogo
-    ld de, LogoTopHalf
+    ld de, HeaderLogo
     ld hl, vLogoTiles
     ASSERT HIGH(vLogoTiles) == LOW(hLogoBuffer)
     ld c, h ; ld c, LOW(hLogoBuffer)
-    ; Process all bytes of the built-in logo
-    ld b, (HeaderTitle - HeaderLogo)
 .processLogo
     ld a, [de]
     ldh [c], a
@@ -101,9 +98,9 @@ Setup:
     call DecompressFirstNibble
     call DecompressSecondNibble
     inc de
-    dec b
+    ld a, e
+    cp LOW(HeaderTitle)
     jr nz, .processLogo
-; ========== END MODIFIED ==========
 
     ; ld hl, vRTile
     ld de, RTile
@@ -633,14 +630,12 @@ IF DEF(cgb0)
     jr nz, .copyLogoTile
 ENDC
 
-; ========== MODIFIED: Use built-in logo for the second decompression ==========
 ; cgbE and later revisions of the GBA fixed the logo TOCTTOU
 IF !DEF(cgbE) && !DEF(agb)
-    ld de, LogoTopHalf   ; was HeaderLogo
+    ld de, HeaderLogo
 ELSE
     ld de, hLogoBuffer
 ENDC
-; ========== END MODIFIED ==========
     call DecodeLogoHalf
     ld bc, -$58 ; Go backwards 5 and a half tiles
     add hl, bc
