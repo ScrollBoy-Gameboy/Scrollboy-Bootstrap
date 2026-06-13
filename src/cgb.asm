@@ -48,12 +48,6 @@ LogoBottomHalf:
 ...., ..XX, XXX., .XXX, XXXX, .XXX, XXXX, ..XX, ...., XXXX, XXX., ...., \
 ...., ...X, XX.., .XXX, XXX., ..XX, XXXX, ..XX, ...., XX.., .XX., ....
 
-; End label for the built-in logo data
-BuiltInLogoEnd:
-
-; Compute the total size of the built-in logo (top + bottom halves)
-BUILTIN_LOGO_SIZE EQU BuiltInLogoEnd - LogoTopHalf
-
 RTile:
     PUSHO
     OPT b.X
@@ -99,7 +93,7 @@ Setup:
     ASSERT HIGH(vLogoTiles) == LOW(hLogoBuffer)
     ld c, h ; ld c, LOW(hLogoBuffer)
     ; Process all bytes of the built-in logo
-    ld b, BUILTIN_LOGO_SIZE
+    ld b, (HeaderTitle - HeaderLogo)
 .processLogo
     ld a, [de]
     ldh [c], a
