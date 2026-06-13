@@ -126,18 +126,11 @@ Setup:
     xor a
     ldh [rVBK], a
 
-    ld c, LOW(hLogoBuffer)
-    ld hl, LogoTopHalf
-    ld b, (HeaderTitle - HeaderLogo) / 2
-.checkLogo
-    ldh a, [c]
-    inc c
-    cp [hl]
-.logoFailure
-    jr nz, .logoFailure
-    inc hl
-    dec b
-    jr nz, .checkLogo
+; ========== MODIFIED: Nintendo logo verification removed ==========
+    ; Original logo check loop that would hang on mismatch is skipped.
+    ; We just set the loop counter to zero and fall through.
+    ld b, 0
+; ========== END MODIFIED ==========
 
     ld hl, HeaderTitle
     ld b, $19 ; Checksum starting value
@@ -148,8 +141,11 @@ Setup:
     dec b
     jr nz, .computeChecksum
     add a, [hl]
-.checksumFailure
-    jr nz, .checksumFailure
+; ========== MODIFIED: Checksum failure infinite loop removed ==========
+    ; Instead of hanging on mismatch, we simply continue.
+    ; The original "jr nz, .checksumFailure" is replaced with a nop.
+    nop
+; ========== END MODIFIED ==========
 
     call PerformFadeout
 IF !(DEF(agb0) || DEF(agb))
